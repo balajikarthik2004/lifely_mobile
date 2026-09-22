@@ -95,7 +95,7 @@ export default function HomeScreen() {
         </Pressable>
 
         <View style={styles.headerBody}>
-          <Text variant="screenTitle" numberOfLines={1}>
+          <Text variant="sectionTitle">
             {greetingFor()}, {profile.name.split(' ')[0]} {greetingEmoji()}
           </Text>
           <Text variant="small" color={colors.textSecondary}>

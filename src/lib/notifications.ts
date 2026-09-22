@@ -1,7 +1,14 @@
-import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
+let Notifications: any = null;
+try {
+  Notifications = require('expo-notifications');
+} catch (e) {
+  console.warn('expo-notifications is not available in this environment (likely Expo Go).');
+}
+
 export function setupNotificationHandler() {
+  if (!Notifications) return;
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,
@@ -14,6 +21,8 @@ export function setupNotificationHandler() {
 }
 
 export async function requestPermissionsAsync() {
+  if (!Notifications) return false;
+
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('daily-reminders', {
       name: 'Daily Reminders',
@@ -35,6 +44,8 @@ export async function requestPermissionsAsync() {
 }
 
 export async function scheduleDailyReminder(hour: number = 20, minute: number = 0) {
+  if (!Notifications) return;
+
   // Clear any previously scheduled notifications to avoid duplicates
   await Notifications.cancelAllScheduledNotificationsAsync();
 

@@ -4,7 +4,6 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, Field, Text } from '@/components';
-import { API_ORIGIN } from '@/api';
 import { haptic } from '@/lib/haptics';
 import { useAuthStore } from '@/store/useAuthStore';
 import { colors, radius, spacing } from '@/theme';
@@ -62,13 +61,13 @@ export default function SignInScreen() {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
       <ScrollView
-        contentContainerStyle={[styles.root, { paddingTop: insets.top + spacing.xxxl }]}
+        contentContainerStyle={[styles.root, { paddingTop: insets.top }]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.intro}>
           <Text style={styles.mark}>🌱</Text>
-          <Text variant="screenTitle">{creating ? 'Start your Lifely' : 'Welcome back'}</Text>
-          <Text variant="small" color={colors.textSecondary}>
+          <Text variant="screenTitle" center>{creating ? 'Start your Lifely' : 'Welcome back'}</Text>
+          <Text variant="small" color={colors.textSecondary} center>
             {creating
               ? 'Your tasks, habits, goals and credits live on your account, so they follow you to any device.'
               : 'Sign in to pick up exactly where you left off.'}
@@ -153,11 +152,6 @@ export default function SignInScreen() {
           </Pressable>
         </View>
 
-        {/* Which server this build is talking to — the one thing worth knowing
-            when the app cannot reach it. */}
-        <Text variant="meta" color={colors.textTertiary} center>
-          {API_ORIGIN}
-        </Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -170,9 +164,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xxxl,
     gap: spacing.xxl,
+    justifyContent: 'center',
   },
-  intro: { gap: spacing.sm },
-  mark: { fontSize: 44, lineHeight: 52 },
+  intro: { gap: spacing.sm, alignItems: 'center' },
+  mark: { fontSize: 56, lineHeight: 64, marginBottom: spacing.md },
   form: { gap: spacing.lg },
   error: {
     padding: spacing.md,

@@ -16,9 +16,7 @@
       "package": "com.lifely.app",
       "adaptiveIcon": {
         "backgroundColor": "#E7F5EF",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/icon.png"
       },
       "predictiveBackGestureEnabled": false
     },
@@ -33,7 +31,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
+          "image": "./assets/icon.png",
           "imageWidth": 180,
           "resizeMode": "contain",
           "backgroundColor": "#F6F7F5"
@@ -44,6 +42,19 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e3098452-86cd-4e0a-83ef-aca37db15eed"
+      }
+    },
+    "owner": "balaji004",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e3098452-86cd-4e0a-83ef-aca37db15eed"
     }
   }
 }

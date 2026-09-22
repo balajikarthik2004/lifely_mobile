@@ -88,56 +88,64 @@ export default function AssistantScreen() {
           }
         />
 
-        <ScrollView
-          ref={scrollRef}
-          style={styles.flex}
-          contentContainerStyle={styles.messages}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {chat.length === 0 ? (
-            <View style={styles.intro}>
-              <View style={styles.introIcon}>
-                <Text style={styles.introEmoji}>{'✨'}</Text>
+        <View style={styles.scrollWrapper}>
+          <ScrollView
+            ref={scrollRef}
+            style={styles.flex}
+            contentContainerStyle={styles.messages}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {chat.length === 0 ? (
+              <View style={styles.intro}>
+                <View style={styles.introIcon}>
+                  <Text style={styles.introEmoji}>{'✨'}</Text>
+                </View>
+                <Text variant="sectionTitle" center>
+                  Ask about your own data
+                </Text>
+                <Text variant="small" color={colors.textSecondary} center style={styles.introBody}>
+                  I only work from what is recorded in Lifely — your day, habits, goals, credits and
+                  reflections. If something is not logged, I will say so rather than guess.
+                </Text>
               </View>
-              <Text variant="sectionTitle" center>
-                Ask about your own data
-              </Text>
-              <Text variant="small" color={colors.textSecondary} center style={styles.introBody}>
-                I only work from what is recorded in Lifely — your day, habits, goals, credits and
-                reflections. If something is not logged, I will say so rather than guess.
-              </Text>
-            </View>
-          ) : (
-            chat.map((message) => (
-              <AIMessage key={message.id} message={message} onSuggestion={send} />
-            ))
-          )}
+            ) : (
+              <>
+                <View style={styles.flex} />
+                {chat.map((message) => (
+                  <AIMessage key={message.id} message={message} onSuggestion={send} />
+                ))}
+              </>
+            )}
 
-          {thinking ? <AIThinking /> : null}
-        </ScrollView>
+            {thinking ? <AIThinking /> : null}
+          </ScrollView>
+        </View>
 
-        {/* Quick actions */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.quickActions}
-          keyboardShouldPersistTaps="handled"
-        >
-          {AI_QUICK_ACTIONS.map((action) => (
-            <Chip
-              key={action}
-              label={action}
-              size="md"
-              color={colors.primaryDark}
-              background={colors.primaryTint}
-              onPress={() => void send(action)}
-            />
-          ))}
-        </ScrollView>
+        <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}>
+          {/* Quick actions */}
+          {chat.length === 0 ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.quickActions}
+              keyboardShouldPersistTaps="handled"
+            >
+              {AI_QUICK_ACTIONS.map((action) => (
+                <Chip
+                  key={action}
+                  label={action}
+                  size="md"
+                  color={colors.primaryDark}
+                  background={colors.primaryTint}
+                  onPress={() => void send(action)}
+                />
+              ))}
+            </ScrollView>
+          ) : null}
 
-        {/* Composer */}
-        <View style={[styles.composer, { paddingBottom: insets.bottom + spacing.md }]}>
+          {/* Composer */}
+          <View style={styles.composer}>
           <TextInput
             value={input}
             onChangeText={setInput}
@@ -176,19 +184,23 @@ export default function AssistantScreen() {
           <Text variant="meta">Private to your account · Data controls in Settings</Text>
         </Pressable>
       </View>
+      </View>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  scrollWrapper: { flex: 1, minHeight: 0 },
   root: { flex: 1, backgroundColor: colors.background },
+  footer: { backgroundColor: colors.background },
   messages: {
+    flexGrow: 1,
     paddingHorizontal: SCREEN_PADDING,
     paddingBottom: spacing.xl,
     gap: spacing.lg,
   },
-  intro: { alignItems: 'center', paddingVertical: spacing.huge, gap: spacing.sm },
+  intro: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.huge, gap: spacing.sm },
   introIcon: {
     width: 56,
     height: 56,
