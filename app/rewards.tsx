@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, Platform, StyleSheet, View } from 'react-native';
 
 import {
   Button,
@@ -107,9 +107,55 @@ export default function RewardsScreen() {
               reward={reward}
               balance={balance}
               onRedeem={confirmRedeem}
-              onLongPress={() =>
-                router.push({ pathname: '/reward-editor', params: { id: reward.id } })
-              }
+              onLongPress={() => {
+                if (Platform.OS === 'web') {
+                  const confirmEdit = window.confirm(`Edit ${reward.title}?\n\n(Click Cancel to Delete instead)`);
+                  if (confirmEdit) {
+                    router.push({ pathname: '/reward-editor', params: { id: reward.id } });
+                  } else {
+                    const confirmDelete = window.confirm(`Are you sure you want to delete ${reward.title}?`);
+                    if (confirmDelete) {
+                      haptic.success();
+                      useAppStore.getState().deleteReward(reward.id);
+                    }
+                  }
+                  return;
+                }
+
+                Alert.alert(
+                  'Reward Options',
+                  `What would you like to do with ${reward.title}?`,
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Edit',
+                      onPress: () =>
+                        router.push({ pathname: '/reward-editor', params: { id: reward.id } }),
+                    },
+                    {
+                      text: 'Delete',
+                      style: 'destructive',
+                      onPress: () => {
+                        Alert.alert(
+                          'Delete Reward',
+                          'Are you sure you want to delete this reward?',
+                          [
+                            { text: 'Cancel', style: 'cancel' },
+                            {
+                              text: 'Delete',
+                              style: 'destructive',
+                              onPress: () => {
+                                haptic.success();
+                                useAppStore.getState().deleteReward(reward.id);
+                              },
+                            },
+                          ]
+                        );
+                      },
+                    },
+                  ]
+                );
+              }}
             />
           ))
         )}
@@ -125,7 +171,7 @@ export default function RewardsScreen() {
             onPress={() => router.push('/reward-editor')}
           />
           <Text variant="meta" center style={styles.hint}>
-            Long-press a reward to edit it.
+            Hold a reward for 3 seconds to edit or delete it.
           </Text>
         </View>
       ) : null}

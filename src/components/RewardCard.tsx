@@ -1,5 +1,5 @@
 import { Feather } from '@expo/vector-icons';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { formatNumber } from '@/lib/format';
 import { colors, elevation, radius, spacing } from '@/theme';
@@ -23,7 +23,14 @@ export function RewardCard({ reward, balance, onRedeem, onLongPress }: RewardCar
   const timesRedeemed = reward.redemptions.length;
 
   return (
-    <View style={[styles.card, elevation.sm]} onTouchEnd={undefined}>
+    <Pressable 
+      style={({ pressed }) => [styles.card, elevation.sm, pressed && onLongPress ? styles.pressedCard : null]}
+      delayLongPress={3000}
+      onLongPress={() => {
+        haptic.select();
+        onLongPress?.(reward);
+      }}
+    >
       <View style={styles.header}>
         <View style={[styles.icon, affordable && styles.iconReady]}>
           <Text style={styles.iconText}>{reward.icon}</Text>
@@ -74,10 +81,9 @@ export function RewardCard({ reward, balance, onRedeem, onLongPress }: RewardCar
           variant={affordable ? 'primary' : 'secondary'}
           disabled={!affordable}
           onPress={() => onRedeem(reward)}
-          onLongPress={() => onLongPress?.(reward)}
         />
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -89,6 +95,10 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.border,
+  },
+  pressedCard: {
+    opacity: 0.9,
+    transform: [{ scale: 0.98 }],
   },
   header: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   icon: {

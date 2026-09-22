@@ -9,6 +9,8 @@ import {
   type ViewStyle,
 } from 'react-native';
 
+import { Feather } from '@expo/vector-icons';
+
 import { haptic } from '@/lib/haptics';
 import { colors, fonts, MIN_TOUCH, radius, spacing } from '@/theme';
 
@@ -25,28 +27,46 @@ interface FieldProps extends TextInputProps {
   containerStyle?: StyleProp<ViewStyle>;
 }
 
-export function Field({ label, hint, error, containerStyle, style, ...rest }: FieldProps) {
+export function Field({ label, hint, error, containerStyle, style, secureTextEntry, ...rest }: FieldProps) {
   const [focused, setFocused] = useState(false);
+  const [isSecure, setIsSecure] = useState(secureTextEntry);
 
   return (
     <View style={[styles.group, containerStyle]}>
       <Text variant="smallStrong" color={colors.textSecondary} style={styles.label}>
         {label}
       </Text>
-      <TextInput
-        placeholderTextColor={colors.textTertiary}
-        accessibilityLabel={label}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        {...rest}
-        style={[
-          styles.input,
-          rest.multiline && styles.multiline,
-          focused && styles.inputFocused,
-          error ? styles.inputError : null,
-          style,
-        ]}
-      />
+      <View style={styles.inputWrapper}>
+        <TextInput
+          placeholderTextColor={colors.textTertiary}
+          accessibilityLabel={label}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          secureTextEntry={isSecure}
+          {...rest}
+          style={[
+            styles.input,
+            rest.multiline && styles.multiline,
+            focused && styles.inputFocused,
+            error ? styles.inputError : null,
+            secureTextEntry && { paddingRight: 45 },
+            style,
+          ]}
+        />
+        {secureTextEntry ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={isSecure ? "Show password" : "Hide password"}
+            onPress={() => {
+              haptic.select();
+              setIsSecure(!isSecure);
+            }}
+            style={styles.rightAccessory}
+          >
+            <Feather name={isSecure ? "eye" : "eye-off"} size={18} color={colors.textTertiary} />
+          </Pressable>
+        ) : null}
+      </View>
       {error ? (
         <Text variant="meta" color={colors.danger} style={styles.hint}>
           {error}
@@ -238,6 +258,16 @@ const styles = StyleSheet.create({
   },
   inputFocused: { borderColor: colors.primarySoft, backgroundColor: colors.surface },
   inputError: { borderColor: colors.danger },
+  inputWrapper: { position: 'relative', justifyContent: 'center' },
+  rightAccessory: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    paddingHorizontal: spacing.lg,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   hint: { marginLeft: 2 },
 
   segmented: {
