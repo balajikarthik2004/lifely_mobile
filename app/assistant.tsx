@@ -95,6 +95,7 @@ export default function AssistantScreen() {
             contentContainerStyle={styles.messages}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
+            onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
           >
             {chat.length === 0 ? (
               <View style={styles.intro}>

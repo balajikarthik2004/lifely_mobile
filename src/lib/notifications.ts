@@ -29,6 +29,7 @@ export async function requestPermissionsAsync() {
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FF231F7C',
+      sound: 'success.wav',
     });
   }
 
@@ -53,7 +54,7 @@ export async function scheduleDailyReminder(hour: number = 20, minute: number = 
     content: {
       title: "Log Your Day! 📝",
       body: "Take a moment to track your habits and activities for today.",
-      sound: true,
+      sound: 'success.wav',
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,

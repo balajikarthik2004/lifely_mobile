@@ -21,6 +21,7 @@ import * as api from '@/api';
 import { errorMessage, HISTORY_WINDOW_DAYS } from '@/api';
 import { lastNDays, todayKey } from '@/lib/date';
 import { createId } from '@/lib/id';
+import { playSuccessSound } from '@/lib/sounds';
 import type {
   Activity,
   ChatMessage,
@@ -582,7 +583,10 @@ export const useAppStore = create<AppState>()(
           const wasCompleted = habit.log[dateKey] === 'COMPLETED';
           const nextLog = { ...habit.log };
           if (wasCompleted) delete nextLog[dateKey];
-          else nextLog[dateKey] = 'COMPLETED';
+          else {
+            nextLog[dateKey] = 'COMPLETED';
+            void playSuccessSound();
+          }
 
           set((s) => ({
             habits: s.habits.map((h) => (h.id === id ? { ...h, log: nextLog } : h)),

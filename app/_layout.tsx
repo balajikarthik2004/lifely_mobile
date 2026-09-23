@@ -14,11 +14,13 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ToastHost } from '@/components/ui';
 import { requestPermissionsAsync, scheduleDailyReminder, setupNotificationHandler } from '@/lib/notifications';
+import { initSounds } from '@/lib/sounds';
 import { useAppStore } from '@/store/useAppStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { colors } from '@/theme';
 
 void SplashScreen.preventAutoHideAsync();
+void initSounds();
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
