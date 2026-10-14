@@ -42,9 +42,12 @@
       [
         "expo-notifications",
         {
-          "sounds": ["./assets/success.wav"]
+          "sounds": [
+            "./assets/success.wav"
+          ]
         }
-      ]
+      ],
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true
