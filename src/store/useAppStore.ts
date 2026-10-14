@@ -321,6 +321,10 @@ export const useAppStore = create<AppState>()(
               api.focus.active(),
             ]);
 
+            // The session store no longer fetches the account itself, so this
+            // is where it learns who is signed in.
+            useAuthStore.getState().setUser(user);
+
             set({
               ...accountFrom(user),
               tasks,

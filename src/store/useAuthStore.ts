@@ -42,21 +42,19 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   error: null,
   busy: false,
 
+  /**
+   * Decided from disk alone, so the splash screen never waits on the network.
+   *
+   * A stored pair is taken at face value and the app opens immediately. It is
+   * proven moments later by `bootstrap`, whose own `users.me()` refreshes the
+   * token or, if the session is truly gone, trips `setSessionExpiredHandler`
+   * below and returns to sign-in. Nothing from the account is on screen before
+   * that answer arrives — only the server's reply unlocks the dashboard — so
+   * trusting the token early costs nothing and saves a whole round trip.
+   */
   restore: async () => {
     const tokens = await loadTokens();
-    if (!tokens) {
-      set({ status: 'signedOut', user: null });
-      return;
-    }
-
-    try {
-      // This also proves the stored token still works — and refreshes it if the
-      // access token has expired but the session has not.
-      const user = await users.me();
-      set({ status: 'signedIn', user });
-    } catch {
-      set({ status: 'signedOut', user: null });
-    }
+    set(tokens ? { status: 'signedIn' } : { status: 'signedOut', user: null });
   },
 
   signIn: async (email, password) => {
