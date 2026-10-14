@@ -2,6 +2,7 @@ import { Feather } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { formatNumber } from '@/lib/format';
+import { haptic } from '@/lib/haptics';
 import { colors, elevation, radius, spacing } from '@/theme';
 import type { Reward } from '@/types';
 
