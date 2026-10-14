@@ -1,5 +1,6 @@
 import { Redirect } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { Button, Text } from '@/components';
 import { useAppStore } from '@/store/useAppStore';
@@ -23,7 +24,7 @@ export default function Index() {
   // The account is signed in but its data has not arrived yet, so there is
   // nothing truthful to show — including whether onboarding is needed.
   if (status === 'idle' || status === 'loading') {
-    return <View style={styles.root} />;
+    return <Loading />;
   }
 
   if (status === 'error') {
@@ -53,6 +54,34 @@ export default function Index() {
   }
 
   return <Redirect href={onboarded ? '/(tabs)' : '/onboarding'} />;
+}
+
+/**
+ * The wait while the account loads.
+ *
+ * A host that sleeps when idle can take most of a minute to answer its first
+ * request, and a bare screen for that long reads as a hang. The explanation
+ * only appears once the wait is long enough to need one, so an ordinary warm
+ * start still shows nothing but a spinner.
+ */
+function Loading() {
+  const [slow, setSlow] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSlow(true), 4000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <View style={[styles.root, styles.message]}>
+      <ActivityIndicator color={colors.textSecondary} />
+      {slow ? (
+        <Text variant="small" color={colors.textSecondary} center>
+          Waking the server up. This can take up to a minute after a quiet spell.
+        </Text>
+      ) : null}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

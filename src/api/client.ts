@@ -41,6 +41,38 @@ interface ErrorBody {
   error?: { code?: string; message?: string; details?: unknown };
 }
 
+/**
+ * Long enough for a host that sleeps when idle to boot and answer, short enough
+ * that a request can never hang for the rest of the session. `fetch` on its own
+ * has no deadline, so without this a dead connection waits forever.
+ */
+const REQUEST_TIMEOUT_MS = 45_000;
+
+/** `fetch`, but it always either answers or throws within the deadline. */
+async function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch {
+    if (controller.signal.aborted) {
+      throw new ApiError(
+        0,
+        'TIMEOUT',
+        'The server took too long to answer. It may be starting up — try again in a moment.',
+      );
+    }
+    throw new ApiError(
+      0,
+      'NETWORK_ERROR',
+      'Cannot reach the server. Check that it is running and that this device can see it.',
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function toApiError(response: Response): Promise<ApiError> {
   let body: ErrorBody = {};
   try {
@@ -65,7 +97,7 @@ let refreshInFlight: Promise<TokenPair | null> | null = null;
 
 async function performRefresh(refreshToken: string): Promise<TokenPair | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
@@ -122,19 +154,11 @@ async function send(path: string, options: RequestOptions, token?: string): Prom
   if (options.body !== undefined) headers['Content-Type'] = 'application/json';
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  try {
-    return await fetch(buildUrl(path, options.query), {
-      method: options.method ?? 'GET',
-      headers,
-      body: options.body === undefined ? undefined : JSON.stringify(options.body),
-    });
-  } catch {
-    throw new ApiError(
-      0,
-      'NETWORK_ERROR',
-      'Cannot reach the server. Check that it is running and that this device can see it.',
-    );
-  }
+  return fetchWithTimeout(buildUrl(path, options.query), {
+    method: options.method ?? 'GET',
+    headers,
+    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+  });
 }
 
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
